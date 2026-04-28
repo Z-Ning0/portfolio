@@ -3,14 +3,13 @@
 import { useMDXComponent } from "next-contentlayer/hooks";
 import { cn } from "@/lib/utils";
 
-// ── MDX 自定义组件（深色内容区背景为白色，文字为 zinc-900） ────────
+// ── MDX 自定义组件 ────────────────────────────────────────────────
 
 const mdxComponents = {
   h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
       className={cn(
-        "mt-10 mb-4 font-heading text-2xl font-bold text-zinc-900",
-        "border-b border-zinc-100 pb-2",
+        "mt-12 mb-4 font-heading text-2xl font-bold text-zinc-900",
         className
       )}
       {...props}
@@ -19,7 +18,7 @@ const mdxComponents = {
   h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       className={cn(
-        "mt-8 mb-3 font-heading text-xl font-semibold text-zinc-900",
+        "mt-8 mb-3 font-heading text-xl font-semibold text-zinc-800",
         className
       )}
       {...props}
@@ -36,30 +35,27 @@ const mdxComponents = {
   ),
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className={cn(
-        "my-4 text-base leading-[1.85] text-zinc-600",
-        className
-      )}
+      className={cn("my-5 text-base leading-[1.9] text-zinc-600", className)}
       {...props}
     />
   ),
   ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className={cn("my-4 space-y-2 pl-5", className)}
+      className={cn("my-5 space-y-3", className)}
       {...props}
     />
   ),
   ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
-      className={cn("my-4 list-decimal space-y-2 pl-5", className)}
+      className={cn("my-5 list-none space-y-3 counter-reset-[item]", className)}
       {...props}
     />
   ),
   li: ({ className, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
     <li
       className={cn(
-        "text-base leading-relaxed text-zinc-600",
-        "marker:text-zinc-400",
+        "flex items-start gap-3 rounded-xl bg-zinc-50 px-4 py-3",
+        "text-sm leading-relaxed text-zinc-700",
         "[&>ul]:mt-2 [&>ul]:mb-0",
         className
       )}
@@ -81,8 +77,8 @@ const mdxComponents = {
   }: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
       className={cn(
-        "my-6 border-l-4 border-blue-400 pl-5",
-        "text-base italic text-zinc-500",
+        "my-8 rounded-2xl border-l-4 border-blue-500 bg-blue-50 px-6 py-5",
+        "text-base italic text-blue-900/70",
         className
       )}
       {...props}
@@ -90,7 +86,7 @@ const mdxComponents = {
   ),
   hr: ({ className, ...props }: React.HTMLAttributes<HTMLHRElement>) => (
     <hr
-      className={cn("my-8 border-zinc-100", className)}
+      className={cn("my-10 border-zinc-100", className)}
       {...props}
     />
   ),
@@ -141,11 +137,38 @@ export type MdxRendererProps = {
   code: string;
 };
 
+// 为列表项自动注入前缀装饰
+function ListItemWithDot({ className, children, ...props }: React.HTMLAttributes<HTMLLIElement>) {
+  return (
+    <li
+      className={cn(
+        "flex items-start gap-3 rounded-xl bg-zinc-50 px-4 py-3",
+        "text-sm leading-relaxed text-zinc-700",
+        className
+      )}
+      {...props}
+    >
+      <span
+        className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[9px] font-bold text-blue-600"
+        aria-hidden="true"
+      >
+        ✓
+      </span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
+const enhancedComponents = {
+  ...mdxComponents,
+  li: ListItemWithDot,
+};
+
 export function MdxRenderer({ code }: MdxRendererProps) {
   const Content = useMDXComponent(code);
   return (
     <div className="mdx-content">
-      <Content components={mdxComponents} />
+      <Content components={enhancedComponents} />
     </div>
   );
 }
